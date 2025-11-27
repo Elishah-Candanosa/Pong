@@ -162,7 +162,6 @@ def dibujar_juego(rect_izq, rect_der, rect_pelota, color_paleta, color_pelota, m
 
 # ---------------------------------------------------------------------
 # Comunicación con Arduino: leer pots y botones, enviar frame
-# (NO se renombran aquí las variables que se usan en el paquete serial)
 # ---------------------------------------------------------------------
 def leer_potenciometros_y_botones(ser):
     # devuelve (pot1, pot2, btn1, btn2) si hay una línea disponible, sino (None, None, None, None)
@@ -262,7 +261,7 @@ def reflejar_pelota_elipse(ball_rect, ellipse_rect, dx, dy, ball_radius=None):
     return dx_new, dy_new
 
 # ---------------------------------------------------------------------
-# Bucle principal de la partida (sin normalización de velocidad)
+# Bucle principal de la partida
 # ---------------------------------------------------------------------
 def ejecutar_partida(ser, color_paleta, color_pelota, velocidad, puntaje_ganador, sonido, jugar_en_arduino=False):
     # limpiar buffer serial si lo hay
