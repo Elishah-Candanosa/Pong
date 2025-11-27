@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8__
-# Pong unificado para PC (Pantalla) o OLED (Arduino SH1106 full-buffer).
-# Comentarios extensos: casi línea por línea en español, para entender cada parte.
 # - Modo Pantalla: visualización y sonido en el PC (no se envían frames al Arduino).
 # - Modo OLED: se envían frames al Arduino; el Arduino dibuja y (opcionalmente) maneja el zumbador.
-# Nota: cierra el Monitor Serial del IDE antes de ejecutar este programa.
 
 import pygame           # Biblioteca para gráficos y sonido en PC
 import sys              # Acceso a funciones del sistema (salir)
