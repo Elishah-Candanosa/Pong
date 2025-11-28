@@ -5,11 +5,11 @@
 U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
 
 // Pines empleados en la placa Arduino
-const int POT_IZQ = A0;     // Canal analógico A0: potenciómetro izquierdo (si aplica)
-const int POT_DER = A1;    // Canal analógico A1: potenciómetro derecho (si aplica)
-const int BTN1 = 2;          // Pin digital 2: botón 1 (entrada con pull-up en host)
-const int BTN2 = 3;          // Pin digital 3: botón 2
-const int BUZZER = 6;        // Pin digital 6: salida para el zumbador (buzzer)
+const int POT_IZQ = A0;     
+const int POT_DER = A1;    
+const int BTN1 = 2;          
+const int BTN2 = 3;          
+const int BUZZER = 6;        
 
 // Temporización para envío de lecturas a la lap.
 const unsigned long Mandar_Intervalo_MS = 33UL;  // intervalo en ms (~30 Hz)
@@ -31,10 +31,10 @@ const uint16_t melodiaDuracion[]   PROGMEM = {140, 120, 115, 140, 120, 120, 300,
 const uint8_t melodialongitud = sizeof(melodiaNotas) / sizeof(melodiaNotas[0]); // longitud de la melodía
 
 // Variables para reproducción de melodía de forma no bloqueante
-bool aromperlabocina = false;     // indica si la melodía está en curso
-uint8_t indicemelodia = 0;        // índice de la nota actual
+bool aromperlabocina = false;     
+uint8_t indicemelodia = 0;        
 unsigned long noteEndMillis = 0;// instante en que termina la nota actual
-const unsigned long pausa_entre_notuelas = 40UL; // pausa entre notas en ms
+const unsigned long pausa_entre_notuelas = 40UL; 
 
 // Control para evitar beeps repetidos (cooldown)
 unsigned long ultiBeepMilis = 0;
@@ -44,10 +44,12 @@ const unsigned long Para_de_beepear = 40UL; // tiempo mínimo entre beeps cortos
 bool ya_se_gano = false;               // overlay activo o no
 unsigned long victoriaEndMillis = 0;       // instante en que debe ocultarse el overlay
 const unsigned long Muestra_Ganadores_YA = 2500UL; // duración del overlay en ms
-// decision_del_destino: 0 = desconocido, 1 = izquierda, 2 = derecha
+
+// 0 = desconocido, 1 = izquierda, 2 = derecha
 uint8_t decision_del_destino = 0;
 
-// Trigger para esperar un pequeño retraso tras recibir 'W' antes de decidir el ganador
+// Trigger para esperar un pequeño retraso tras recibir 'W' antes de decidir el ganador. DE repente la pantallita sólo decía
+//GANA: "" y ps qué es eso ajsjajsjasj
 bool triger_victoria = false;            // se activó el trigger de victoria
 unsigned long triger_victoriaMillis = 0; // instante en que se activó el trigger
 const unsigned long Delay_Victoria_MS = 1000UL; // tiempo de espera antes de decidir ganador
@@ -56,8 +58,8 @@ const unsigned long Delay_Victoria_MS = 1000UL; // tiempo de espera antes de dec
 void setup() {
   pinMode(BTN1, INPUT_PULLUP);    // configurar botón 1 como INPUT_PULLUP
   pinMode(BTN2, INPUT_PULLUP);    // configurar botón 2 como INPUT_PULLUP
-  pinMode(BUZZER, OUTPUT);        // pin del buzzer como salida
-  pinMode(LED_BUILTIN, OUTPUT);   // LED incorporado como salida (lo usamos como heartbeat)
+  pinMode(BUZZER, OUTPUT);      
+  pinMode(LED_BUILTIN, OUTPUT);   // Para saber si sí está recibiendo info, si parpadea mal, es que algo está mal
 
   Serial.begin(115200);           // iniciar comunicación serial a 115200 baudios
   u8g2.begin();                   // inicializar la pantalla U8g2
@@ -68,9 +70,9 @@ void setup() {
   // Pantalla inicial simple para indicar que el programa arrancó
   u8g2.clearBuffer();             // limpiar buffer de la pantalla
   u8g2.setFont(u8g2_font_6x10_tr); // seleccionar fuente pequeña
-  u8g2.drawStr(8, 30, "PONG READY"); // dibujar texto fijo (no se modifica)
-  u8g2.sendBuffer();              // enviar buffer a la pantalla
-  delay(50);                      // pequeño retardo para estabilizar
+  u8g2.drawStr(8, 30, "PONG READY");
+  u8g2.sendBuffer();              
+  delay(50);                      
 }
 
 // Lectura segura desde PROGMEM (helper)
@@ -81,16 +83,17 @@ static inline uint16_t pgm_read_u16_safe(const uint16_t *p) {
 // Iniciar la melodía (modo no bloqueante)
 // Esta función arranca la reproducción de la primera nota y prepara el temporizador
 void Hora_de_la_Orquesta() {
-  aromperlabocina = true;                           // marcar que se está reproduciendo
+  aromperlabocina = true;                           
   indicemelodia = 0;                                // empezar por la nota 0
   uint16_t n = pgm_read_u16_safe(&melodiaNotas[indicemelodia]); // leer frecuencia
-  tone(BUZZER, n);                                // empezar a emitir la frecuencia en el buzzer
+  tone(BUZZER, n);                                
   uint16_t d = pgm_read_u16_safe(&melodiaDuracion[indicemelodia]);  // leer duración
   noteEndMillis = millis() + d;                   // calcular cuándo termina esta nota
 }
 
 // Actualiza la melodía (debe llamarse frecuentemente desde loop())
 // Gestiona cambio de nota y finalización sin bloquear el loop principal
+//No creo que se arme, pero Héctor quiere meter música. No sabe lo que sufrí haciendo esto ajsjasjajs.
 void Actualiza_Melodia() {
   if (!aromperlabocina) return;                     // si no hay melodía, salir rápido
   unsigned long now = millis();                   // instante actual
@@ -110,7 +113,7 @@ void Actualiza_Melodia() {
 }
 
 // Reproducir melodía en modo bloqueante (uso especial, bloquea el loop)
-//Sugerencia de Stack Overflow
+//Sugerencia de Stack Overflow. Por alguna razón sirve
 void playBlockingMelody() {
   for (uint8_t i = 0; i < melodialongitud; ++i) {
     uint16_t n = pgm_read_u16_safe(&melodiaNotas[i]); // frecuencia
@@ -145,13 +148,9 @@ void destila_informacion(char *buf) {
   while (*buf == ' ' || *buf == '\t') buf++;
   if (*buf == '\0') return; // línea vacía -> nada que hacer
 
-  // Comando corto: 'B' = beep corto
   if ((buf[0] == 'B' || buf[0] == 'b') && buf[1] == '\0') { Beepea(); return; }
 
-  // Comando corto: 'W' = señal de victoria desde el host
   if ((buf[0] == 'W' || buf[0] == 'w') && buf[1] == '\0') {
-    // El host indica victoria: en esta versión se INICIA la melodía inmediatamente
-    // y además se activa un trigger para esperar un frame final. (lógica original)
     Hora_de_la_Orquesta();                            // iniciar melodía de victoria de inmediato
     triger_victoria = true;                  // activar trigger para decidir ganador más tarde
     triger_victoriaMillis = millis();        // marcar el instante de activación
@@ -162,8 +161,8 @@ void destila_informacion(char *buf) {
   // Comando corto: 'V' = reproducir melodía en modo bloqueante
   if ((buf[0] == 'V' || buf[0] == 'v') && buf[1] == '\0') { playBlockingMelody(); return; }
 
-  // Si no es comando simple, asumimos que es un frame CSV: lp_y,rp_y,bx,by[,puntaje_izq,puntaje_der]
-  const int MAXV = 6;                // máximo de valores CSV esperados
+  // Si no es comando simple, asumimos que es un frame CSV: lp_y,rp_y,bx,by[,puntaje_izq,puntaje_der].Así viene de PongCity en Python
+  const int MAXV = 6;                // máximo de valores CSV esperados (pq los puntajes vienen al final, por eso 6)
   int vals[MAXV] = {0,0,0,0,0,0};    // array para almacenar valores parseados
   int idx = 0;
   char *token = strtok(buf, ",");    // tokenizar por comas
@@ -221,7 +220,7 @@ void dibuja_pantalla_exitosa() {
 void loop() {
   unsigned long now = millis(); // instante actual
 
-  // Envío periódico de lecturas al host (opcional): potenciómetros y botones
+  // Envío periódico de lecturas a la lap. COmunicación Tierra-Cielo
   if (now - lastSendMillis >= Mandar_Intervalo_MS) {
     int pL = analogRead(POT_IZQ);   // leer pot izquierdo
     int pR = analogRead(POT_DER);  // leer pot derecho
